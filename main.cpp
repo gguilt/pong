@@ -2,18 +2,19 @@
                         Finished on December 20th 2014 - 05:06 **/
 
 /// Header files:
-#include <stdio.h> // Using for terminal i/o
-#include <cmath> // Using for geometry rendering
-#include <random> // Using for ball auto-movement
+#include <stdio.h>  // Used for terminal i/o
+#include <cmath>    // Used for geometry rendering
+#include <random>   // Used for ball auto-movement
 
-#include <SDL.h> // Using for basics of SDL
-#include <SDL_image.h> // Using for font header & ball
-#include <SDL_ttf.h> // Using for scoreboard
+#include <SDL2/SDL.h>       // Used for basics of SDL
+#include <SDL2/SDL_image.h> // Used for font header & ball
+#include <SDL2/SDL_ttf.h>   // Used for scoreboard
 
 /// Variables & settings:
-#define WINDOW_TITLE	"Pong the Game ~"
-#define WINDOW_WIDTH	(1500)
-#define WINDOW_HEIGHT	(900)
+#define WINDOW_TITLE	"Pong the Game"
+#define WINDOW_WIDTH	(900)
+#define WINDOW_HEIGHT	(500)
+
 bool isRestartTime = false;
 int leftScore = 0, rightScore = 0;
 std::string whoWin_str = " ";
@@ -45,10 +46,7 @@ class Texture
 		Texture(); // Initializes variables
 		~Texture(); // Deallocates memory
 		bool loadFromFile(std::string path); // Loads image at specified path
-
-		#ifdef _SDL_TTF_H
 		bool loadFromRenderedText(std::string textureText, SDL_Color textColor); // Creates image from font string
-		#endif
 
 		void free(); // Deallocates texture
 		void setColor(Uint8 red, Uint8 green, Uint8 blue); // Set color modulation
@@ -68,7 +66,7 @@ class Texture
 // Scene textures
 Texture gDotTexture;
 
-LTexture::LTexture()
+Texture::Texture()
 {
 	// Initialize
 	mTexture = NULL;
@@ -76,12 +74,12 @@ LTexture::LTexture()
 	mHeight = 0;
 }
 
-LTexture::~LTexture()
+Texture::~Texture()
 {
 	free(); // Deallocate
 }
 
-bool LTexture::loadFromFile(std::string path)
+bool Texture::loadFromFile(std::string path)
 {
 	free(); // Get rid of preexisting texture
 	SDL_Texture* newTexture = NULL; // The final texture
@@ -111,8 +109,7 @@ bool LTexture::loadFromFile(std::string path)
 	return mTexture != NULL;
 }
 
-#ifdef _SDL_TTF_H
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
+bool Texture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
 {
 	free(); // Get rid of preexisting texture
 	SDL_Surface* textSurface = TTF_RenderText_Solid(g_Font, textureText.c_str(), textColor); // Render text surface
@@ -140,9 +137,8 @@ bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor
 
 	return mTexture != NULL; // Return success
 }
-#endif
 
-void LTexture::free()
+void Texture::free()
 {
 	if(mTexture != NULL) // Free texture if it exists
 	{
@@ -153,22 +149,22 @@ void LTexture::free()
 	}
 }
 
-void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
+void Texture::setColor(Uint8 red, Uint8 green, Uint8 blue)
 {
 	SDL_SetTextureColorMod(mTexture, red, green, blue); // Modulate texture RGB
 }
 
-void LTexture::setBlendMode(SDL_BlendMode blending)
+void Texture::setBlendMode(SDL_BlendMode blending)
 {
 	SDL_SetTextureBlendMode(mTexture, blending); // Set blending function
 }
 
-void LTexture::setAlpha(Uint8 alpha)
+void Texture::setAlpha(Uint8 alpha)
 {
 	SDL_SetTextureAlphaMod(mTexture, alpha); // Modulate texture alpha
 }
 
-void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight }; // Set rendering space and render to screen
 
@@ -181,25 +177,25 @@ void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cen
 	SDL_RenderCopyEx(g_Renderer, mTexture, clip, &renderQuad, angle, center, flip); // Render to screen
 }
 
-int LTexture::getWidth()
+int Texture::getWidth()
 {
 	return mWidth;
 }
 
-int LTexture::getHeight()
+int Texture::getHeight()
 {
 	return mHeight;
 }
 
 // Score board
-LTexture g_whoWin, g_pressSpace;
-LTexture g_leftScore, g_rightScore;
+Texture g_whoWin, g_pressSpace;
+Texture g_leftScore, g_rightScore;
 
 // Dot class & functions
 class Dot {
     public:
-        static const int DOT_WIDTH = 30;
-        static const int DOT_HEIGHT = 30;
+        static const int DOT_WIDTH = 10;
+        static const int DOT_HEIGHT = 10;
         static const int DOT_VEL = 1; // Maximum axis velocity of the dot
 
         Dot(int x, int y); // Initializes the variables
@@ -466,7 +462,7 @@ bool game_loadMedia()
     }
 
     // Loading the scoreboard:
-    g_Font = TTF_OpenFont("BebasNeue.otf", 43);
+    g_Font = TTF_OpenFont("BebasNeue.otf", 28); // Font name, font size
     if(g_Font == NULL)
     {
         printf("[error] Failed to load font! (%s)\n", TTF_GetError());
@@ -540,8 +536,8 @@ int main(int argc, char* argv[]) // The main function
 			SDL_Event e; // Event handler
 
 			// Drawing the player objects
-			SDL_Rect left_fillRect = { WINDOW_WIDTH-40, WINDOW_HEIGHT/2-100, 30, 200 }; // Player left
-			SDL_Rect right_fillRect = { 10, WINDOW_HEIGHT/2-100, 30, 200 }; // Player right
+			SDL_Rect left_fillRect = { WINDOW_WIDTH-40, WINDOW_HEIGHT/2-100, 20, 100 }; // Player left
+			SDL_Rect right_fillRect = { 10, WINDOW_HEIGHT/2-100, 20, 100 }; // Player right
 
 			Dot dot(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2); // The dot that will be moving around on the screen
 
