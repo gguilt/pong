@@ -12,19 +12,19 @@ EXEC = $(BINDIR)/pong
 
 .PHONY: all clean
 
-all: $(BINDIR) $(OBJDIR) $(EXEC)
+all: $(EXEC)
 
-$(EXEC): $(OBJS)
+$(EXEC): $(OBJS) | $(BINDIR)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBS)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BINDIR):
-	mkdir -p $(BINDIR)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 clean:
 	rm -rf $(OBJS) $(EXEC) $(OBJDIR) $(BINDIR)
