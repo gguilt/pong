@@ -1,7 +1,8 @@
-# pong
-Pong made with SDL2
+# Pong
+
+Pong game by Radon Therapy. Made with SDL2.
 
 # License
+
 Bebas Neue font is licensed under OFL.
-SDL2 is licensed under ZLib License (see SDL2-LICENSE.txt)
-All rights reserved for other source code and assets.
+For other code and assets, please read LICENSE file.

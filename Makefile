@@ -2,9 +2,9 @@ OUT = Pong
 CXX = g++
 SDL = -lSDL2 -lSDL2_image -lSDL2_ttf
 
-OBJECTS = main.o
+OBJECTS = obj/main.o
 
 all: $(OUT)
 $(OUT): $(OBJECTS)
-	$(CXX) -o $@ $^ ${SDL}
+	$(CXX) -o bin/$@ $^ ${SDL}
 
