@@ -11,6 +11,7 @@ We aim to implement a very basic version of Pong game with the following feature
 1. Two players
 2. Separated functions when needed
 3. Comply with C99 rules
+4. Score and win/lose scenario
 
 We are not trying to include the following:
 
