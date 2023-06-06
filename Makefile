@@ -1,10 +1,24 @@
-OUT = Pong
-CXX = g++
-SDL = -lSDL2 -lSDL2_image -lSDL2_ttf
+CC = clang
+CFLAGS = -Wall -Wextra -std=c99
+LIBS = -lSDL2
 
-OBJECTS = obj/main.o
+SRCDIR = src
+OBJDIR = obj
+BINDIR = bin
 
-all: $(OUT)
-$(OUT): $(OBJECTS)
-	$(CXX) -o bin/$@ $^ ${SDL}
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
+EXEC = $(BINDIR)/pong
 
+.PHONY: all clean
+
+all: $(EXEC)
+
+$(EXEC): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBS)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(EXEC)
