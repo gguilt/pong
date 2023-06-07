@@ -191,30 +191,30 @@ void game_render()
     
     SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-    SDL_Rect scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 - 50, 50, textSurface->w, textSurface->h };
+    SDL_Rect textRect = (SDL_Rect) { WINDOW_WIDTH / 2 - 50, 50, textSurface->w, textSurface->h };
     
-    SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
 
     snprintf(scoreText, sizeof(scoreText), "%d", opponentScore);
     
     textSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
     textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-    scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 + 50, 50, textSurface->w, textSurface->h };
+    textRect = (SDL_Rect) { WINDOW_WIDTH / 2 + 50, 50, textSurface->w, textSurface->h };
     
-    SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
 
     // Draw win text
     if (gWin) {
         if (playerScore > opponentScore) {
             textSurface = TTF_RenderText_Solid(gFont, "Player won. Press <SPACE> to restart.", textColor);
             textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-            scoreRect = (SDL_Rect) {WINDOW_WIDTH / 2 - 20 - textSurface->w, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
-            SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+            textRect = (SDL_Rect) {WINDOW_WIDTH / 2 - 20 - textSurface->w, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
+            SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
         } else {
             textSurface = TTF_RenderText_Solid(gFont, "Opponent won. Press <SPACE> to restart.", textColor);
             textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-            scoreRect = (SDL_Rect) {WINDOW_WIDTH / 2 + 20, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
-            SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+            textRect = (SDL_Rect) {WINDOW_WIDTH / 2 + 20, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
+            SDL_RenderCopy(gRenderer, textTexture, NULL, &textRect);
         }
     }
     
