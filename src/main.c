@@ -183,28 +183,44 @@ void game_render()
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){ball.x, ball.y, ball.width, ball.height});
 
-    // Draw text
+    // Draw score
     SDL_Color textColor = { 255, 255, 255, 255 };
 
     char scoreText[4];
     snprintf(scoreText, sizeof(scoreText), "%d", playerScore);
     
-    SDL_Surface* scoreSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
-    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(gRenderer, scoreSurface);
-    SDL_Rect scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 - 50, 50, scoreSurface->w, scoreSurface->h };
+    SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+    SDL_Rect scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 - 50, 50, textSurface->w, textSurface->h };
     
-    SDL_RenderCopy(gRenderer, scoreTexture, NULL, &scoreRect);
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
 
     snprintf(scoreText, sizeof(scoreText), "%d", opponentScore);
     
-    scoreSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
-    scoreTexture = SDL_CreateTextureFromSurface(gRenderer, scoreSurface);
-    scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 + 50, 50, scoreSurface->w, scoreSurface->h };
+    textSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
+    textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+    scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 + 50, 50, textSurface->w, textSurface->h };
     
-    SDL_RenderCopy(gRenderer, scoreTexture, NULL, &scoreRect);
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
 
-    SDL_DestroyTexture(scoreTexture);
-    SDL_FreeSurface(scoreSurface);
+    // Draw win text
+    if (gWin) {
+        if (playerScore > opponentScore) {
+            textSurface = TTF_RenderText_Solid(gFont, "Player won. Press <SPACE> to restart.", textColor);
+            textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+            scoreRect = (SDL_Rect) {WINDOW_WIDTH / 2 - 20 - textSurface->w, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
+            SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+        } else {
+            textSurface = TTF_RenderText_Solid(gFont, "Opponent won. Press <SPACE> to restart.", textColor);
+            textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+            scoreRect = (SDL_Rect) {WINDOW_WIDTH / 2 + 20, WINDOW_HEIGHT / 2, textSurface->w, textSurface->h };
+            SDL_RenderCopy(gRenderer, textTexture, NULL, &scoreRect);
+        }
+    }
+    
+
+    SDL_DestroyTexture(textTexture);
+    SDL_FreeSurface(textSurface);
 
     // Render
     SDL_RenderPresent(gRenderer);
