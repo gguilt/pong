@@ -165,37 +165,25 @@ void game_render()
     // Draw text
     SDL_Color textColor = { 255, 255, 255, 255 };
 
-    char playerScoreText[4];
-    char opponentScoreText[4];
-    snprintf(playerScoreText, sizeof(playerScoreText), "%d", playerScore);
-    snprintf(opponentScoreText, sizeof(opponentScoreText), "%d", opponentScore);
+    char scoreText[4];
+    snprintf(scoreText, sizeof(scoreText), "%d", playerScore);
+    
+    SDL_Surface* scoreSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
+    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(gRenderer, scoreSurface);
+    SDL_Rect scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 - 50, 50, scoreSurface->w, scoreSurface->h };
+    
+    SDL_RenderCopy(gRenderer, scoreTexture, NULL, &scoreRect);
 
-    SDL_Surface* playerSurface = TTF_RenderText_Solid(gFont, playerScoreText, textColor);
-    SDL_Surface* opponentSurface = TTF_RenderText_Solid(gFont, opponentScoreText, textColor);
+    snprintf(scoreText, sizeof(scoreText), "%d", opponentScore);
+    
+    scoreSurface = TTF_RenderText_Solid(gFont, scoreText, textColor);
+    scoreTexture = SDL_CreateTextureFromSurface(gRenderer, scoreSurface);
+    scoreRect = (SDL_Rect) { WINDOW_WIDTH / 2 + 50, 50, scoreSurface->w, scoreSurface->h };
+    
+    SDL_RenderCopy(gRenderer, scoreTexture, NULL, &scoreRect);
 
-    SDL_Texture* playerTexture = SDL_CreateTextureFromSurface(gRenderer, playerSurface);
-    SDL_Texture* opponentTexture = SDL_CreateTextureFromSurface(gRenderer, opponentSurface);
-
-    SDL_Rect playerRect;
-    SDL_Rect opponentRect;
-
-    playerRect.x = WINDOW_WIDTH / 2 - 50;
-    playerRect.y = 50;
-    playerRect.w = playerSurface->w;
-    playerRect.h = playerSurface->h;
-
-    opponentRect.x = WINDOW_WIDTH / 2 + 50;
-    opponentRect.y = 50;
-    opponentRect.w = opponentSurface->w;
-    opponentRect.h = opponentSurface->h;
-
-    SDL_RenderCopy(gRenderer, playerTexture, NULL, &playerRect);
-    SDL_RenderCopy(gRenderer, opponentTexture, NULL, &opponentRect);
-
-    SDL_DestroyTexture(playerTexture);
-    SDL_DestroyTexture(opponentTexture);
-    SDL_FreeSurface(playerSurface);
-    SDL_FreeSurface(opponentSurface);
+    SDL_DestroyTexture(scoreTexture);
+    SDL_FreeSurface(scoreSurface);
 
     // Render
     SDL_RenderPresent(gRenderer);
