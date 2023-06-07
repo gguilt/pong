@@ -30,6 +30,7 @@ TTF_Font* gFont = NULL;
 
 // - Game variables
 bool gExit = false;
+bool gWin = false;
 int playerScore = 0;
 int opponentScore = 0;
 
@@ -87,7 +88,18 @@ void game_exit()
     SDL_Quit();
 }
 
-void handle_input() {
+void init_objects()
+{
+    player = (Object) { 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
+    opponent = (Object) { WINDOW_WIDTH - PADDLE_W - 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
+    ball = (Object) { (WINDOW_WIDTH - BALL_SIZE) / 2, (WINDOW_HEIGHT -BALL_SIZE) / 2, BALL_DXY, BALL_DXY, BALL_SIZE, BALL_SIZE };
+
+    playerScore = 0;
+    opponentScore = 0;
+}
+
+void handle_input()
+{
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
@@ -113,6 +125,15 @@ void handle_input() {
                     case SDLK_DOWN:
                         opponent.dy = PADDLE_DY;
                         break;
+
+                    case SDLK_SPACE:
+                        if (gWin) {
+                            gWin = false;
+                            init_objects();
+                        }
+
+                        break;
+
 
                     default:
                         break;
@@ -208,9 +229,7 @@ int main(int argc, char* argv[])
     }
 
     // Initialize players and ball
-    player = (Object) { 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
-    opponent = (Object) { WINDOW_WIDTH - PADDLE_W - 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
-    ball = (Object) { (WINDOW_WIDTH - BALL_SIZE) / 2, (WINDOW_HEIGHT -BALL_SIZE) / 2, BALL_DXY, BALL_DXY, BALL_SIZE, BALL_SIZE };
+    init_objects();
 
     // Initialize fps cap
     Uint32 frameStart, frameTime;
@@ -222,10 +241,36 @@ int main(int argc, char* argv[])
         // Input handling
         handle_input();
 
-        // Move players
-        player.y += player.dy;
-        opponent.y += opponent.dy;
+        // Handle win
+        if (playerScore >= 10 || opponentScore >= 10) {
+            gWin = true;
+        } else {
+            // Move players
+            player.y += player.dy;
+            opponent.y += opponent.dy;
 
+            // Move ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Check ball limits
+            if (ball.x < 0 || ball.x + ball.width > WINDOW_WIDTH) {
+                ball.dx = -ball.dx;
+
+                // Add score
+                if (ball.x < 0) {
+                    opponentScore++;
+                } else {
+                    playerScore++;
+                }
+            }
+            
+            if (ball.y < 0 || ball.y + ball.height > WINDOW_HEIGHT) {
+                ball.dy = -ball.dy;
+            }
+        }
+
+        // Check paddle limits
         if (player.y < 0) {
             player.y = 0;
         } else if (player.y + PADDLE_H > WINDOW_HEIGHT) {
@@ -236,24 +281,6 @@ int main(int argc, char* argv[])
             opponent.y = 0;
         } else if (opponent.y + PADDLE_H > WINDOW_HEIGHT) {
             opponent.y = WINDOW_HEIGHT - PADDLE_H;
-        }
-
-        // Move ball
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-
-        if (ball.x < 0 || ball.x + ball.width > WINDOW_WIDTH) {
-            ball.dx = -ball.dx;
-            
-            if (ball.x < 0) {
-                opponentScore++;
-            } else {
-                playerScore++;
-            }
-        }
-        
-        if (ball.y < 0 || ball.y + ball.height > WINDOW_HEIGHT) {
-            ball.dy = -ball.dy;
         }
 
         // Check paddle and ball collision
