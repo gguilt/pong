@@ -16,8 +16,11 @@
 
 // - Object settings
 #define BALL_SIZE 30
+#define BALL_DXY 5
+
 #define PADDLE_W 20
 #define PADDLE_H 100
+#define PADDLE_DY 5
 
 // - SDL variables
 SDL_Window* gWindow = NULL;
@@ -77,19 +80,19 @@ void handle_input() {
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_w:
-                        player.dy = -5;
+                        player.dy = -PADDLE_DY;
                         break;
 
                     case SDLK_s:
-                        player.dy = 5;
+                        player.dy = PADDLE_DY;
                         break;
 
                     case SDLK_UP:
-                        opponent.dy = -5;
+                        opponent.dy = -PADDLE_DY;
                         break;
 
                     case SDLK_DOWN:
-                        opponent.dy = 5;
+                        opponent.dy = PADDLE_DY;
                         break;
 
                     default:
@@ -148,7 +151,7 @@ int main(int argc, char* argv[])
     // Initialize players and ball
     player = (Object) { 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
     opponent = (Object) { WINDOW_WIDTH - PADDLE_W - 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
-    ball = (Object) { (WINDOW_WIDTH - BALL_SIZE) / 2, (WINDOW_HEIGHT -BALL_SIZE) / 2, 0, 0, BALL_SIZE, BALL_SIZE };
+    ball = (Object) { (WINDOW_WIDTH - BALL_SIZE) / 2, (WINDOW_HEIGHT -BALL_SIZE) / 2, BALL_DXY, BALL_DXY, BALL_SIZE, BALL_SIZE };
 
     // Initialize fps cap
     Uint32 frameStart, frameTime;
@@ -174,6 +177,24 @@ int main(int argc, char* argv[])
             opponent.y = 0;
         } else if (opponent.y + PADDLE_H > WINDOW_HEIGHT) {
             opponent.y = WINDOW_HEIGHT - PADDLE_H;
+        }
+
+        // Move ball
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        if (ball.x < 0 || ball.x + ball.width > WINDOW_WIDTH) {
+            ball.dx = -ball.dx;
+            
+            if (ball.x < 0) {
+                printf("Opponent score!\n");
+            } else {
+                printf("Player score!\n");
+            }
+        }
+        
+        if (ball.y < 0 || ball.y + ball.height > WINDOW_HEIGHT) {
+            ball.dy = -ball.dy;
         }
 
         // Rendering
