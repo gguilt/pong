@@ -14,6 +14,11 @@
 #define WINDOW_HEIGHT 600
 #define FRAME_DELAY_MS (1000 / 60) // 60 FPS
 
+// - Object settings
+#define BALL_SIZE 30
+#define PADDLE_W 20
+#define PADDLE_H 100
+
 // - SDL variables
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
@@ -141,9 +146,9 @@ int main(int argc, char* argv[])
     game_init();
 
     // Initialize players and ball
-    player = (Object) { 20, (WINDOW_HEIGHT - 100) / 2, 0, 0, 20, 100 };
-    opponent = (Object) { WINDOW_WIDTH - 20 - 20, (WINDOW_HEIGHT - 100) / 2, 0, 0, 20, 100 };
-    ball = (Object) { WINDOW_WIDTH / 2 - 15, WINDOW_HEIGHT / 2 - 15, 0, 0, 30, 30 };
+    player = (Object) { 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
+    opponent = (Object) { WINDOW_WIDTH - PADDLE_W - 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
+    ball = (Object) { (WINDOW_WIDTH - BALL_SIZE) / 2, (WINDOW_HEIGHT -BALL_SIZE) / 2, 0, 0, BALL_SIZE, BALL_SIZE };
 
     // Initialize fps cap
     Uint32 frameStart, frameTime;
@@ -158,6 +163,18 @@ int main(int argc, char* argv[])
         // Move players
         player.y += player.dy;
         opponent.y += opponent.dy;
+
+        if (player.y < 0) {
+            player.y = 0;
+        } else if (player.y + PADDLE_H > WINDOW_HEIGHT) {
+            player.y = WINDOW_HEIGHT - PADDLE_H;
+        }
+
+        if (opponent.y < 0) {
+            opponent.y = 0;
+        } else if (opponent.y + PADDLE_H > WINDOW_HEIGHT) {
+            opponent.y = WINDOW_HEIGHT - PADDLE_H;
+        }
 
         // Rendering
         game_render();
