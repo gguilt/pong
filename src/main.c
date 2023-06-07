@@ -12,6 +12,7 @@
 // - Window settings
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+#define FRAME_DELAY_MS (1000 / 60) // 60 FPS
 
 // - SDL variables
 SDL_Window* gWindow = NULL;
@@ -19,6 +20,15 @@ SDL_Renderer* gRenderer = NULL;
 
 // - Game variables
 bool gExit = false;
+
+// - Players and ball
+typedef struct {
+    int x, y;
+    int dx, dy;
+    int width, height;
+} Object;
+
+Object player, opponent, ball;
 
 // Functions
 bool game_init()
@@ -59,6 +69,46 @@ void handle_input() {
                 gExit = true;
                 break;
 
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym) {
+                    case SDLK_w:
+                        player.dy = -5;
+                        break;
+
+                    case SDLK_s:
+                        player.dy = 5;
+                        break;
+
+                    case SDLK_UP:
+                        opponent.dy = -5;
+                        break;
+
+                    case SDLK_DOWN:
+                        opponent.dy = 5;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case SDL_KEYUP:
+                switch (event.key.keysym.sym) {
+                    case SDLK_w:
+                    case SDLK_s:
+                        player.dy = 0;
+                        break;
+
+                    case SDLK_UP:
+                    case SDLK_DOWN:
+                        opponent.dy = 0;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
             default:
                 break;
         }
@@ -71,6 +121,16 @@ void game_render()
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(gRenderer);
 
+    // Draw objects
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(gRenderer, &(SDL_Rect){player.x, player.y, player.width, player.height});
+
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(gRenderer, &(SDL_Rect){opponent.x, opponent.y, opponent.width, opponent.height});
+
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(gRenderer, &(SDL_Rect){ball.x, ball.y, ball.width, ball.height});
+
     // Render
     SDL_RenderPresent(gRenderer);
 }
@@ -80,9 +140,33 @@ int main(int argc, char* argv[])
 {
     game_init();
 
+    // Initialize players and ball
+    player = (Object) { 20, (WINDOW_HEIGHT - 100) / 2, 0, 0, 20, 100 };
+    opponent = (Object) { WINDOW_WIDTH - 20 - 20, (WINDOW_HEIGHT - 100) / 2, 0, 0, 20, 100 };
+    ball = (Object) { WINDOW_WIDTH / 2 - 15, WINDOW_HEIGHT / 2 - 15, 0, 0, 30, 30 };
+
+    // Initialize fps cap
+    Uint32 frameStart, frameTime;
+
     while(!gExit) {
+        // Set start time for fps cap
+        frameStart = SDL_GetTicks();
+
+        // Input handling
         handle_input();
+
+        // Move players
+        player.y += player.dy;
+        opponent.y += opponent.dy;
+
+        // Rendering
         game_render();
+
+        // Delay
+        frameTime = SDL_GetTicks() - frameStart;
+        if (FRAME_DELAY_MS > frameTime) {
+            SDL_Delay(FRAME_DELAY_MS - frameTime);
+        }
     }
 
     game_exit();
