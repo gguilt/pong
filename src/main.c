@@ -1,6 +1,6 @@
 // Pong SDL2 by Radon Therapy
 // Initial version: 2014-10-08 05:11 - 2014-12-20 05:06
-// Rewrite: 2023-06-06 19:38 - 
+// Rewrite: 2023-06-06 19:38 - 2023-06-07 18:41
 
 // Header files
 #include <stdio.h>
