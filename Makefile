@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -Wall -Wextra -std=c99
-LIBS = -lSDL2
+LIBS = -lSDL2 -lSDL2_ttf
 
 SRCDIR = src
 OBJDIR = obj

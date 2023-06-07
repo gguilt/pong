@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 // Variables and constants
 
@@ -25,9 +26,12 @@
 // - SDL variables
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
+TTF_Font* gFont = NULL;
 
 // - Game variables
 bool gExit = false;
+int playerScore = 0;
+int opponentScore = 0;
 
 // - Players and ball
 typedef struct {
@@ -46,6 +50,12 @@ bool game_init()
         return false;
     }
 
+    if (TTF_Init() != 0) {
+        printf("[error] Couldn't initialize SDL2_TTF: %s\n", TTF_GetError());
+        SDL_Quit();
+        return false;
+    }
+
     gWindow = SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (!gWindow) {
         printf("[error] Couldn't create window: %s\n", SDL_GetError());
@@ -58,13 +68,22 @@ bool game_init()
         return false;
     }
 
+    gFont = TTF_OpenFont("assets/BebasNeue-Regular.ttf", 28);
+    if (!gFont) {
+        printf("[error] Couldn't load font: %s\n", TTF_GetError());
+        return false;
+    }
+
     return true;
 }
 
 void game_exit()
 {
+    TTF_CloseFont(gFont);
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
+
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -129,6 +148,10 @@ void game_render()
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(gRenderer);
 
+    // Draw line
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderDrawLine(gRenderer, WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+
     // Draw objects
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){player.x, player.y, player.width, player.height});
@@ -138,6 +161,41 @@ void game_render()
 
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){ball.x, ball.y, ball.width, ball.height});
+
+    // Draw text
+    SDL_Color textColor = { 255, 255, 255, 255 };
+
+    char playerScoreText[4];
+    char opponentScoreText[4];
+    snprintf(playerScoreText, sizeof(playerScoreText), "%d", playerScore);
+    snprintf(opponentScoreText, sizeof(opponentScoreText), "%d", opponentScore);
+
+    SDL_Surface* playerSurface = TTF_RenderText_Solid(gFont, playerScoreText, textColor);
+    SDL_Surface* opponentSurface = TTF_RenderText_Solid(gFont, opponentScoreText, textColor);
+
+    SDL_Texture* playerTexture = SDL_CreateTextureFromSurface(gRenderer, playerSurface);
+    SDL_Texture* opponentTexture = SDL_CreateTextureFromSurface(gRenderer, opponentSurface);
+
+    SDL_Rect playerRect;
+    SDL_Rect opponentRect;
+
+    playerRect.x = WINDOW_WIDTH / 2 - 50;
+    playerRect.y = 50;
+    playerRect.w = playerSurface->w;
+    playerRect.h = playerSurface->h;
+
+    opponentRect.x = WINDOW_WIDTH / 2 + 50;
+    opponentRect.y = 50;
+    opponentRect.w = opponentSurface->w;
+    opponentRect.h = opponentSurface->h;
+
+    SDL_RenderCopy(gRenderer, playerTexture, NULL, &playerRect);
+    SDL_RenderCopy(gRenderer, opponentTexture, NULL, &opponentRect);
+
+    SDL_DestroyTexture(playerTexture);
+    SDL_DestroyTexture(opponentTexture);
+    SDL_FreeSurface(playerSurface);
+    SDL_FreeSurface(opponentSurface);
 
     // Render
     SDL_RenderPresent(gRenderer);
@@ -157,7 +215,9 @@ bool check_collision(Object rect1, Object rect2) {
 // Main function
 int main(int argc, char* argv[])
 {
-    game_init();
+    if (!game_init()) {
+        return 1;
+    }
 
     // Initialize players and ball
     player = (Object) { 20, (WINDOW_HEIGHT - PADDLE_H) / 2, 0, 0, PADDLE_W, PADDLE_H };
@@ -198,9 +258,9 @@ int main(int argc, char* argv[])
             ball.dx = -ball.dx;
             
             if (ball.x < 0) {
-                printf("Opponent score!\n");
+                opponentScore++;
             } else {
-                printf("Player score!\n");
+                playerScore++;
             }
         }
         
@@ -224,4 +284,5 @@ int main(int argc, char* argv[])
     }
 
     game_exit();
+    return 0;
 }
