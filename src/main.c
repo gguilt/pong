@@ -16,7 +16,7 @@
 #define FRAME_DELAY_MS (1000 / 60) // 60 FPS
 
 // - Object settings
-#define BALL_SIZE 30
+#define BALL_SIZE 20
 #define BALL_DXY 5
 
 #define PADDLE_W 20
