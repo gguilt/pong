@@ -169,18 +169,15 @@ void game_render()
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(gRenderer);
 
-    // Draw line
+    // White
     SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    // Draw line
     SDL_RenderDrawLine(gRenderer, WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
 
     // Draw objects
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){player.x, player.y, player.width, player.height});
-
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){opponent.x, opponent.y, opponent.width, opponent.height});
-
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
     SDL_RenderFillRect(gRenderer, &(SDL_Rect){ball.x, ball.y, ball.width, ball.height});
 
     // Draw score
