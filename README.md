@@ -2,8 +2,6 @@
 
 Pong is a game developed by Radon Therapy using SDL2.
 
-For the game page, please visit [here](https://radontherapy.itch.io/pong-sdl2).
-
 ## Project Scope
 
 We aim to implement a very basic version of Pong game with the following features:
