@@ -1,35 +1,102 @@
+/*
+ * Bong
+ * Copyright (c) 2014-2024 Radon Therapy
+ * This project is licensed under MIT License
+ */
+
 #include <stdio.h>
 #include <SDL3/SDL.h>
 
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL_main.h>
 
+/*
+ * global variables
+ */
+
 SDL_Window *gameWindow = NULL;
 SDL_Renderer *gameRenderer = NULL;
 
-// PART FOR BB
+enum GAME_STATES {
+	INTRO_STATE = 1U,
+	MENU_STATE = 2U,
+	GAME_STATE = 3U,
+	PAUSE_STATE = 4U
+};
+
+unsigned int current_state = INTRO_STATE;
 
 /*
-SDL_Texture*
-BB_CreateBMPTexture(char *location)
+ * function prototypes
+ */
+
+void intro_keyd_actions(SDL_Keycode);
+void intro_render(void);
+
+void menu_keyd_actions(SDL_Keycode);
+void menu_render(void);
+
+void ingame_keyd_actions(SDL_Keycode);
+void ingame_render(void);
+
+/*
+ * game state functions
+ */
+
+void
+intro_keyd_actions(SDL_Keycode key)
 {
-	SDL_Texture *texture = NULL;
-	SDL_Surface *surface = NULL;
-	
-	surface = SDL_LoadBMP(location);
-	texture = SDL_CreateTextureFromSurface(gameRenderer, surface);
-
-	SDL_DestroySurface(surface);
-
-	return &texture;
+	if (key == SDLK_ESCAPE) {
+		current_state = MENU_STATE;
+	}
 }
-*/
 
-// PART FOR GAME
-//
-//
+void
+menu_keyd_actions(SDL_Keycode key)
+{
+	if (key == SDLK_ESCAPE) {
+		current_state = GAME_STATE;
+	}
+}
 
+void
+ingame_keyd_actions(SDL_Keycode key)
+{
+	if (key == SDLK_ESCAPE) {
+		current_state = INTRO_STATE;
+	}
+}
 
+void
+intro_render(void)
+{
+	SDL_FRect myRect = { 70, 70, 30, 75 };
+
+	SDL_SetRenderDrawColor(gameRenderer, 255, 0, 0, 255);
+	SDL_RenderFillRect(gameRenderer, &myRect);
+}
+
+void
+menu_render(void)
+{
+	SDL_FRect myRect = { 70, 70, 30, 75 };
+
+	SDL_SetRenderDrawColor(gameRenderer, 0, 255, 0, 255);
+	SDL_RenderFillRect(gameRenderer, &myRect);
+}
+
+void
+ingame_render(void)
+{
+	SDL_FRect myRect = { 70, 70, 30, 75 };
+
+	SDL_SetRenderDrawColor(gameRenderer, 0, 0, 255, 255);
+	SDL_RenderFillRect(gameRenderer, &myRect);
+}
+
+/*
+ * sdl callbacks
+ */
 
 SDL_AppResult
 SDL_AppInit(void **appstate, int argc, char **argv)
@@ -56,19 +123,27 @@ SDL_AppInit(void **appstate, int argc, char **argv)
 SDL_AppResult
 SDL_AppIterate(void *appstate)
 {
-	//SDL_SetRenderDrawColor(gameRenderer, 255, 255, 255, 255);
-	//SDL_RenderFillRect(gameRenderer, &myRect);
-	//
-	//
-	//
-	
-	SDL_FRect myRect = { 15, 35, 50, 75 };
-
-	SDL_SetRenderDrawColor(gameRenderer, 25, 255, 25, 255);
+	// we clear screen here so next render won't be written on top of that
+	SDL_SetRenderDrawColor(gameRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(gameRenderer);
 
-	SDL_SetRenderDrawColor(gameRenderer, 255, 25, 25, 255);
-	SDL_RenderFillRect(gameRenderer, &myRect);
+	// here we try to navigate app to different states
+	switch (current_state) {
+		case INTRO_STATE:
+			intro_render();
+			break;
+
+		case MENU_STATE:
+			menu_render();
+			break;
+
+		case GAME_STATE:
+			ingame_render();
+			break;
+
+		default:
+			break;
+	}
 
 	SDL_RenderPresent(gameRenderer);
 
@@ -80,6 +155,25 @@ SDL_AppEvent(void *appstate, SDL_Event *event)
 {
 	if (event->type == SDL_EVENT_QUIT) {
 		return SDL_APP_SUCCESS;
+	}
+
+	if (event->type == SDL_EVENT_KEY_DOWN) {
+		switch (current_state) {
+			case INTRO_STATE:
+				intro_keyd_actions(event->key.key);
+				break;
+
+			case MENU_STATE:
+				menu_keyd_actions(event->key.key);
+				break;
+
+			case GAME_STATE:
+				ingame_keyd_actions(event->key.key);
+				break;
+
+			default:
+				break;
+		}
 	}
 
 	return SDL_APP_CONTINUE;
