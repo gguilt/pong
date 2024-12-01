@@ -12,7 +12,7 @@ Project is currently under development. Our plan for Bong is;
 
 ## Features
 
-- Utilizing SDL3 callback system
+- Utilizing SDL3 main callbacks ([check this](https://wiki.libsdl.org/SDL3/README/main-functions#main-callbacks-in-sdl3))
 
 ## History of the Project
 
